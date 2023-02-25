@@ -3,7 +3,7 @@ package br.unitins.model;
 import javax.persistence.Entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-@Entity
+@Entity 
 public class Otica extends PanacheEntity {
     private String modelo;
     private String marca;
