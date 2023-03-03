@@ -2,6 +2,7 @@ package br.unitins.resource;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -14,36 +15,36 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.hibernate.hql.internal.ast.exec.IdSubselectUpdateExecutor;
-
 import br.unitins.model.Otica;
+import br.unitins.repository.OticaRepository;
 
-@Path("/Oculos")
+@Path("/otica")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class OticaResource {
+
+    @Inject
+    private OticaRepository repository;
+
     @GET
-    @Path("/todos")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Otica> getall(){
-        return Otica.findAll().list();
+    @Path("/all")
+    public List<Otica> getall() {
+        return repository.findAll().list();
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Otica inserir(Otica otica){
-        otica.persist();
+    public Otica inserir(Otica otica) {
+        repository.persist(otica);
         return otica;
     }
 
-    //altera tudo
+    // altera tudo
     @PUT
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Otica alterarTudo(@PathParam("id")Long id, Otica otica){
-        Otica oticaid = Otica.findById(id);
+    public Otica alterarTudo(@PathParam("id") Long id, Otica otica) {
+        Otica oticaid = repository.findById(id);
         oticaid.setModelo(otica.getModelo());
         oticaid.setMarca(otica.getMarca());
         oticaid.setLente(otica.getLente());
@@ -52,38 +53,43 @@ public class OticaResource {
         return oticaid;
     }
 
-    //altera parcialmente
+    // altera parcialmente
     @PATCH
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Otica alterarParcialmente(@PathParam("id")Long id, Otica otica){
-        Otica oticaid = Otica.findById(id);
+    public Otica alterarParcialmente(@PathParam("id") Long id, Otica otica) {
+        Otica oticaid = repository.findById(id);
         oticaid.setModelo(otica.getModelo());
         oticaid.setMarca(otica.getMarca());
         return oticaid;
     }
 
-    //consultar
+    // consultar
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Otica consultarId(@PathParam("id")Long id){
-        return Otica.findById(id);
+    public Otica consultarId(@PathParam("id") Long id) {
+        return repository.findById(id);
     }
-
 
     @DELETE
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Otica deletar(@PathParam("id")Long id, Otica otica){
-        Otica oticaid = Otica.findById(id);
-        oticaid.delete(); 
+    public Otica deletar(@PathParam("id") Long id, Otica otica) {
+        Otica oticaid = repository.findById(id);
+        repository.delete(oticaid);
         return oticaid;
     }
+
+    // pesquisar por modelo
+    @GET
+    @Path("/search/{modelo}")
+    public Otica buscarModelo(@PathParam("modelo") String modelo) {
+        return repository.findByNome(modelo);
+    }
+
+    @GET
+    @Path("/searchList/{modelo}")
+    public List<Otica> buscarLista(@PathParam("modelo") String modelo) {
+        return repository.findByNomeList(modelo);
+    }
 }
-
-
